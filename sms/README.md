@@ -20,3 +20,6 @@ En el apartado Configuración > Técnico se añade la opción "SMS" con los sigu
 ## Crones
 
 ### SMS USAGE REPORTS 
+Frecuencia: 1 vez al día
+
+Descripción: Se conecta al bucket de S3 donde están almacenados los reportes de SMS, se leen las líneas y se "actualiza" respecto a los SMS enviados previamente (estado de entrega, precio, numero de parte, partes totales). Siempre va con un día de retraso como mínimo ya que NO se guarda en S3 el reporte de hoy hasta mañana
