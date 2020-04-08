@@ -66,15 +66,6 @@ class SaleOrder(models.Model):
                 sms_compose_message_obj.send_sms_action()
                 
                 if sms_compose_message_obj.action_send==True:
-                    #save_log
-                    arelux_automation_log_vals = {                    
-                        'model': 'sale.order',
-                        'res_id': self.id,
-                        'category': 'sale_order',
-                        'action': 'send_sms',                                                                                                                                                                                           
-                    }
-                    arelux_automation_log_obj = self.env['arelux.automation.log'].sudo().create(arelux_automation_log_vals)
-                
                     if self.date_order_send_sms==False:                                                                                                                             
                         self.date_order_send_sms = datetime.today()
                         
