@@ -121,7 +121,7 @@ class SaleOrder(models.Model):
             ir_model_data = self.env['ir.model.data']
             
             try:
-                sms_template_id = ir_model_data.get_object_reference('sms_arelux', 'sms_template_id_default_sale_order')[1]
+                sms_template_id = ir_model_data.get_object_reference('sms', 'sms_template_id_default_sale_order')[1]
             except ValueError:
                 sms_template_id = False            
                                 
