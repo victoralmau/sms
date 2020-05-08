@@ -67,15 +67,8 @@ class SmsTemplate(models.Model):
     name = fields.Char(
         string='Nombre'
     )
-    sender = fields.Selection(
-        [
-            ('Todocesped', 'Todocesped'),
-            ('Arelux', 'Arelux'),
-            ('Evert', 'Evert'),        
-        ],
-        size=15, 
-        string='Sender default', 
-        default='Todocesped'
+    sender = fields.Char(         
+        string='Sender default'
     )    
     message = fields.Text(
         string='Contenido'

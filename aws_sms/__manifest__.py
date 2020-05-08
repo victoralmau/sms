@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'SMS',
+    'name': 'AWS SMS',
     'version': '10.0.1.0.0',    
     'author': 'Odoo Nodriza Tech (ONT)',
     'website': 'https://nodrizatech.com/',
