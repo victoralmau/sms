@@ -7,6 +7,7 @@ Addons
 ----------------
 nombre | version
 --- | ---
-[sms](sms/) | 10.0.1.0.0
-[sms_sale](sms_sale/) | 10.0.1.0.0
-[sms_shipping_expedition](sms_shipping_expedition/) | 10.0.1.0.0
+[aws_sms](aws_sms/) | 12.0.1.0.0
+[aws_sms_arelux](aws_sms_arelux/) | 12.0.1.0.0
+[aws_sms_sale](aws_sms_sale/) | 12.0.1.0.0
+[aws_sms_shipping_expedition](aws_sms_shipping_expedition/) | 12.0.1.0.0
