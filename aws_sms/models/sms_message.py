@@ -5,7 +5,7 @@ from datetime import datetime
 import boto3
 from botocore.exceptions import ClientError
 
-import urllib2
+from urllib.request import urlopen
 import json
 import gzip
 import io
@@ -15,7 +15,6 @@ import logging
 _logger = logging.getLogger(__name__)
 
 #https://docs.aws.amazon.com/sns/latest/dg/sms_stats_usage.html
-
 class SmsMessage(models.Model):
     _name = 'sms.message'
     _description = 'SMS Message'
@@ -188,8 +187,8 @@ class SmsMessage(models.Model):
                 sms_message_id.part_number = line_split[6]
                 sms_message_id.total_parts = line_split[7]
                                     
-    @api.multi    
-    def cron_sms_usage_reports(self, cr=None, uid=False, context=None):
+    @api.model    
+    def cron_sms_usage_reports(self):
         AWS_ACCESS_KEY_ID = tools.config.get('aws_access_key_id')        
         AWS_SECRET_ACCESS_KEY = tools.config.get('aws_secret_key_id')
         bucket_sms_report = 'sms-report-arelux'
@@ -223,7 +222,7 @@ class SmsMessage(models.Model):
                                 ExpiresIn = 100
                             )
                             
-                            page=urllib2.urlopen(return_presigned_url)
+                            page=urlopen(return_presigned_url)
                             gzip_filehandle=gzip.GzipFile(fileobj=io.BytesIO(page.read()))
                             content_file = gzip_filehandle.readlines()
                             

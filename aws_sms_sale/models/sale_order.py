@@ -2,8 +2,8 @@
 import logging
 _logger = logging.getLogger(__name__)
 
-from openerp import api, models, fields
-from openerp.exceptions import Warning
+from odoo import api, models, fields
+from odoo.exceptions import Warning
 
 import phonenumbers
 from phonenumbers import carrier
@@ -36,9 +36,6 @@ class SaleOrder(models.Model):
                             
             if self.partner_id.mobile==False:
                 allow_send_sms = False
-                
-            if allow_send_sms==True and self.partner_id.mobile_code_res_country_id==False:
-                allow_send_sms = False
                             
             if allow_send_sms==True:
                 self.action_generate_sale_order_link_tracker()
@@ -47,7 +44,6 @@ class SaleOrder(models.Model):
                 sms_compose_message_vals = {
                     'model': 'sale.order',
                     'res_id': self.id,
-                    'country_id': self.partner_id.mobile_code_res_country_id.id,
                     'mobile': self.partner_id.mobile,
                     'sms_template_id': sms_template_id
                 }
@@ -91,27 +87,21 @@ class SaleOrder(models.Model):
         if allow_send==True and self.partner_id.mobile==False:
             allow_send = False
             raise Warning("Es necesario definir un movil")
-                                        
-        if allow_send==True and (self.partner_id.mobile_code==False or self.partner_id.mobile_code_res_country_id.id==0):
-            allow_send = False
-            raise Warning("Es necesario prefijo de movil")
             
         if allow_send==True:
-            if '+' in self.partner_id.mobile:
+            if '+' not in self.partner_id.mobile:
                 allow_send = False
-                raise Warning("El prefijo NO debe estar definido en el movil")                                    
+                raise Warning("El prefijo NO está definido")                                    
         
         if allow_send==True:
-            number_to_check = '+'+str(self.partner_id.mobile_code)+str(self.partner_id.mobile)
-            
             try:
-                return_is_mobile = carrier._is_mobile(number_type(phonenumbers.parse(number_to_check, self.partner_id.mobile_code_res_country_id.code)))
+                return_is_mobile = carrier._is_mobile(number_type(phonenumbers.parse(self.partner_id.mobile)))
                 if return_is_mobile==False:
                     allow_send = False
                     raise Warning("El movil no es valido")
             except phonenumbers.NumberParseException:
                 allow_send = False
-                raise Warning("El movil no es valido")            
+                raise Warning("El movil no es valido (NumberParseException)")            
         
         if allow_send==True and self.partner_id.opt_out==True:
             allow_send = False
@@ -143,7 +133,6 @@ class SaleOrder(models.Model):
                 'default_res_id': self.ids[0],
                 'default_use_template': True,
                 'default_sms_template_id': sms_template_id,
-                'default_country_id': self.partner_id.mobile_code_res_country_id.id,
                 'default_mobile': self.partner_id.mobile,
                 'default_sender': default_sender,
                 'custom_layout': "sms_arelux.sms_template_data_notification_sms_sale_order"

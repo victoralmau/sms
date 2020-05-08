@@ -4,7 +4,8 @@ import boto3
 import copy
 import datetime
 
-from urllib import urlencode, quote as quote
+from urllib.parse import urlencode, quote as quote
+from functools import reduce
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -67,15 +68,8 @@ class SmsTemplate(models.Model):
     name = fields.Char(
         string='Nombre'
     )
-    sender = fields.Selection(
-        [
-            ('Todocesped', 'Todocesped'),
-            ('Arelux', 'Arelux'),
-            ('Evert', 'Evert'),        
-        ],
-        size=15, 
-        string='Sender default', 
-        default='Todocesped'
+    sender = fields.Char(
+        string='Sender default' 
     )    
     message = fields.Text(
         string='Contenido'

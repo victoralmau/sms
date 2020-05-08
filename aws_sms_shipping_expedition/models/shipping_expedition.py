@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from openerp import _, api, exceptions, fields, models
+from odoo import _, api, exceptions, fields, models
 from datetime import datetime
 
 import logging
@@ -28,15 +28,11 @@ class ShippingExpedition(models.Model):
                         if self.partner_id.mobile==False:
                             allow_send_sms = False
                             
-                        if allow_send_sms==True and self.partner_id.mobile_code_res_country_id==False:
-                            allow_send_sms = False
-                            
                         if allow_send_sms==True:
                             sms_template_item = self.env['sms.template'].search([('id', '=', sms_template_id)])[0]                                
                             sms_compose_message_vals = {
                                 'model': 'shipping.expedition',
                                 'res_id': self.id,
-                                'country_id': self.partner_id.mobile_code_res_country_id.id,
                                 'mobile': self.partner_id.mobile,
                                 'sms_template_id': sms_template_id
                             }
@@ -82,8 +78,7 @@ class ShippingExpedition(models.Model):
                 ('delegation_name', '!=', False),
                 ('delegation_phone', '!=', False),
                 ('partner_id.mobile', '!=', False),
-                ('partner_id.mobile', 'not like', '+'),
-                ('partner_id.mobile_code_res_country_id', '!=', False),
+                ('partner_id.mobile', 'like', '+'),
             ]
         )
         if len(shipping_expedition_ids)>0:
@@ -114,7 +109,6 @@ class ShippingExpedition(models.Model):
                 ('delegation_name', '!=', False),
                 ('delegation_phone', '!=', False),
                 ('partner_id.mobile', '!=', False),
-                ('partner_id.mobile_code_res_country_id', '!=', False),
             ]
         )
         if len(shipping_expedition_ids)>0:

@@ -53,10 +53,19 @@ class SmsComposeMessage(models.Model):
         
             mobile = self.mobile.strip()
             if '+' in str(mobile):
-                mobile = mobile.replace('+'+str(wizard_item.country_id.phone_code), '')
-                
+                if wizard_item.country_id.id>0:
+                    mobile = mobile.replace('+'+str(wizard_item.country_id.phone_code), '')
+                else:
+                    country_code = mobile[1:2]
+                    mobile = mobile[3:]
+                    #country_id
+                    res_country_ids = self.env['res.country'].search([('phone_code', '=', wizard_item.res_id)])
+                    if len(res_country_ids)>0:
+                        res_country_id = res_country_ids[0]
+                        wizard_item.country_id = res_country_id.id
+            #clean                
             mobile = mobile.replace(' ', '')
-        
+            #sms_message_vals
             sms_message_vals = {
                 'country_id': wizard_item.country_id.id,
                 'mobile': mobile,
