@@ -157,13 +157,14 @@ class SmsMessage(models.Model):
         
             self.state = 'failed'
             self.action_send_error_sms_message_message_slack(res_to_slack)
-            
             return False
         else:
             return_action = self.action_send_real()#Fix only return
             #Fix list
             if isinstance(return_action, (list,)):
-                return_action = return_action[0]        
+                return_action = return_action[0]
+                if isinstance(return_action, (list,)):
+                    return_action = return_action[0]
             #slack_message
             if return_action['send']==False:
                 res_to_slack = return_action
