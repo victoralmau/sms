@@ -119,9 +119,11 @@ class SmsComposeMessage(models.Model):
     @api.onchange('sms_template_id')
     def onchange_sms_template_id_wrapper(self):
         self.ensure_one()
-        values = self.onchange_sms_template_id(self.sms_template_id.id, self.model, self.res_id)['value']
-        for fname, value in values.iteritems():
-            setattr(self, fname, value)
+        if self.sms_template_id.id>0:
+            values = self.onchange_sms_template_id(self.sms_template_id.id, self.model, self.res_id)['value']
+            if len(values)>0:
+                for value_key in values:
+                    setattr(self, value_key, values[value_key])
 
     @api.multi
     def onchange_sms_template_id(self, sms_template_id, model, res_id):

@@ -103,7 +103,7 @@ class SaleOrder(models.Model):
                 allow_send = False
                 raise Warning("El movil no es valido (NumberParseException)")            
         
-        if allow_send==True and self.partner_id.opt_out==True:
+        if allow_send==True and self.partner_id.not_allow_marketing_mails==True:
             allow_send = False
             raise Warning("El cliente no acepta mensajes")       
         
