@@ -77,7 +77,7 @@ class ShippingExpedition(models.Model):
 
             ctx = dict()
             ctx.update({
-                'default_model': 'sale.order',
+                'default_model': 'shipping.expedition',
                 'default_res_id': self.ids[0],
                 'default_use_template': True,
                 'default_sms_template_id': sms_template_id,
