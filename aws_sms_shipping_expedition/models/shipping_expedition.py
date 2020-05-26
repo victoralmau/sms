@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
-from openerp import _, api, exceptions, fields, models
+from odoo import api, exceptions, fields, models
+from odoo.exceptions import Warning
 from datetime import datetime
 
 import logging
 _logger = logging.getLogger(__name__)
+
+import phonenumbers
+from phonenumbers import carrier
+from phonenumbers.phonenumberutil import number_type
 
 class ShippingExpedition(models.Model):
     _inherit = 'shipping.expedition'
@@ -11,7 +16,94 @@ class ShippingExpedition(models.Model):
     date_send_sms_info = fields.Datetime(
         string='Fecha SMS info'
     )
-    
+
+    @api.multi
+    def action_send_sms(self):
+        '''
+        This function opens a window to compose an sms, with the edi sale template message loaded by default
+        '''
+        self.ensure_one()
+        # fix
+        self.action_generate_shipping_expedition_link_tracker()
+
+        allow_send = True
+
+        if self.partner_id.id == 0:
+            allow_send = False
+            raise Warning("Es necesario definir un contacto")
+
+        if allow_send == True and self.partner_id.mobile == False:
+            allow_send = False
+            raise Warning("Es necesario definir un movil")
+
+        if allow_send == True:
+            if (self.partner_id.mobile_code==False or self.partner_id.mobile_code_res_country_id.id==0):
+                allow_send = False
+                raise Warning("El prefijo NO está definido")
+
+        if allow_send == True:
+            if '+' in self.partner_id.mobile:
+                allow_send = False
+                raise Warning("El prefijo NO debe estar definido en el movil")
+
+        if allow_send == True:
+            number_to_check = '+' + str(self.partner_id.mobile_code) + str(self.partner_id.mobile)
+            try:
+                return_is_mobile = carrier._is_mobile(number_type(phonenumbers.parse(number_to_check, self.partner_id.mobile_code_res_country_id.code)))
+                if return_is_mobile == False:
+                    allow_send = False
+                    raise Warning("El movil no es valido")
+            except phonenumbers.NumberParseException:
+                allow_send = False
+                raise Warning("El movil no es valido (NumberParseException)")
+
+        if allow_send == True and self.partner_id.opt_out==True:
+            allow_send = False
+            raise Warning("El cliente no acepta mensajes")
+
+        if allow_send == True:
+            ir_model_data = self.env['ir.model.data']
+
+            try:
+                sms_template_id = \
+                ir_model_data.get_object_reference('sms', 'sms_template_id_default_shipping_expedition')[1]
+            except ValueError:
+                sms_template_id = False
+
+            try:
+                compose_form_id = \
+                ir_model_data.get_object_reference('mail', 'sms_template_id_default_shipping_expedition')[1]
+            except ValueError:
+                compose_form_id = False
+
+            # default_sender
+            default_sender = 'Todocesped'
+            if self.ar_qt_activity_type == 'arelux':
+                default_sender = 'Arelux'
+            elif self.ar_qt_activity_type == 'evert':
+                default_sender = 'Evert'
+
+            ctx = dict()
+            ctx.update({
+                'default_model': 'shipping.expedition',
+                'default_res_id': self.ids[0],
+                'default_use_template': True,
+                'default_sms_template_id': sms_template_id,
+                'default_mobile': self.partner_id.mobile,
+                'default_sender': default_sender,
+                'custom_layout': "sms_arelux.sms_template_data_notification_sms_shipping_expedition"
+            })
+            return {
+                'type': 'ir.actions.act_window',
+                'view_type': 'form',
+                'view_mode': 'form',
+                'res_model': 'sms.compose.message',
+                'views': [(compose_form_id, 'form')],
+                'view_id': compose_form_id,
+                'target': 'new',
+                'context': ctx,
+            }
+
     @api.one    
     def action_custom_send_sms_info_slack(self):
         return True
