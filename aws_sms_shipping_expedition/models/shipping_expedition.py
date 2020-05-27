@@ -23,9 +23,7 @@ class ShippingExpedition(models.Model):
         This function opens a window to compose an sms, with the edi sale template message loaded by default
         '''
         self.ensure_one()
-        # fix
-        self.action_generate_shipping_expedition_link_tracker()
-
+        #define
         allow_send = True
 
         if self.partner_id.id == 0:
@@ -147,7 +145,3 @@ class ShippingExpedition(models.Model):
                                     self.action_custom_send_sms_info_slack()  # Fix Slack
 
             return True
-
-    @api.one
-    def action_generate_shipping_expedition_link_tracker(self):
-        return super(ShippingExpedition, self).action_generate_shipping_expedition_link_tracker()
