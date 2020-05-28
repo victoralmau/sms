@@ -32,8 +32,6 @@ class SaleOrder(models.Model):
                 allow_send_sms = False
                             
             if allow_send_sms==True:
-                self.action_generate_sale_order_link_tracker()
-                                        
                 sms_template_item = self.env['sms.template'].search([('id', '=', sms_template_id)])[0]                                
                 sms_compose_message_vals = {
                     'model': 'sale.order',
