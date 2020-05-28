@@ -78,7 +78,7 @@ class SaleOrder(models.Model):
             return_valid_phone = self.env['sms.message'].sudo().action_check_valid_phone(self.partner_id.mobile_code_res_country_id, self.partner_id.mobile)
             allow_send = return_valid_phone['valid']
             if allow_send == False:
-                raise Warning(allow_send['error'])
+                raise Warning(return_valid_phone['error'])
         # final
         if allow_send == True:
             ir_model_data = self.env['ir.model.data']
