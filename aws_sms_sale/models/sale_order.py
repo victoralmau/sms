@@ -76,7 +76,7 @@ class SaleOrder(models.Model):
         '''
         self.ensure_one()
         #fix
-        #super(SaleOrder, self).action_generate_sale_order_link_tracker()
+        super(SaleOrder, self).action_generate_sale_order_link_tracker()
         # define
         allow_send = True
         if allow_send == True and self.partner_id.opt_out == True:
