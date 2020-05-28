@@ -14,11 +14,6 @@ class SaleOrder(models.Model):
     )
     
     @api.one    
-    def action_generate_sale_order_link_tracker(self):
-        super(SaleOrder, self).action_generate_sale_order_link_tracker()
-        return True
-    
-    @api.one    
     def action_custom_send_sms_info_slack(self):
         return True
     
@@ -75,8 +70,6 @@ class SaleOrder(models.Model):
         This function opens a window to compose an sms, with the edi sale template message loaded by default
         '''
         self.ensure_one()
-        #fix
-        super(SaleOrder, self).action_generate_sale_order_link_tracker()
         # define
         allow_send = True
         if allow_send == True and self.partner_id.opt_out == True:
