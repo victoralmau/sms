@@ -14,6 +14,10 @@ import unidecode
 import logging
 _logger = logging.getLogger(__name__)
 
+import phonenumbers
+from phonenumbers import carrier
+from phonenumbers.phonenumberutil import number_type
+
 #https://docs.aws.amazon.com/sns/latest/dg/sms_stats_usage.html
 
 class SmsMessage(models.Model):
@@ -89,8 +93,44 @@ class SmsMessage(models.Model):
     
     @api.one    
     def action_send_error_sms_message_message_slack(self, res):
-        return                                        
-    
+        return
+
+    @api.model
+    def action_check_valid_phone(self, country_id, mobile):
+        return_item = {
+            'error': '',
+            'valid': True
+        }
+        # check mobile
+        if mobile == False or mobile==None:
+            return_item['valid'] = False
+            return_item['error'] = 'Es necesario definir un movil'
+        # check_country_code
+        if country_id.id == 0:
+            return_item['valid'] = False
+            return_item['error'] = 'El prefijo NO está definido'
+        # check prefix in phone
+        if mobile != False:
+            if '+' in mobile:
+                return_item['valid'] = False
+                return_item['error'] = 'El prefijo NO debe estar definido en el movil'
+        # phonenumbers
+        if return_item['valid'] == True:
+            number_to_check = '+' + str(country_id.phone_code) + str(mobile)
+            try:
+                return_is_mobile = carrier._is_mobile(number_type(phonenumbers.parse(number_to_check, country_id.code)))
+                if return_is_mobile == False:
+                    return_item['valid'] = False
+                    return_item['error'] = 'El movil no es valido'
+            except phonenumbers.NumberParseException:
+                return_item['valid'] = False
+                return_item['error'] = 'El movil no es valido (NumberParseException)'
+        # return
+        return return_item
+    @api.one
+    def action_check_valid(self):
+        return self.action_check_valid_phone(self.country_id, self.mobile)
+
     @api.one                               
     def action_send_real(self):
         # Create an SNS client

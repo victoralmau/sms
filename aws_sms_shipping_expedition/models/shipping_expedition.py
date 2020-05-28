@@ -6,10 +6,6 @@ from datetime import datetime
 import logging
 _logger = logging.getLogger(__name__)
 
-import phonenumbers
-from phonenumbers import carrier
-from phonenumbers.phonenumberutil import number_type
-
 class ShippingExpedition(models.Model):
     _inherit = 'shipping.expedition'
 
@@ -25,40 +21,16 @@ class ShippingExpedition(models.Model):
         self.ensure_one()
         #define
         allow_send = True
-
-        if self.partner_id.id == 0:
-            allow_send = False
-            raise Warning("Es necesario definir un contacto")
-
-        if allow_send == True and self.partner_id.mobile == False:
-            allow_send = False
-            raise Warning("Es necesario definir un movil")
-
-        if allow_send == True:
-            if (self.partner_id.mobile_code==False or self.partner_id.mobile_code_res_country_id.id==0):
-                allow_send = False
-                raise Warning("El prefijo NO está definido")
-
-        if allow_send == True:
-            if '+' in self.partner_id.mobile:
-                allow_send = False
-                raise Warning("El prefijo NO debe estar definido en el movil")
-
-        if allow_send == True:
-            number_to_check = '+' + str(self.partner_id.mobile_code) + str(self.partner_id.mobile)
-            try:
-                return_is_mobile = carrier._is_mobile(number_type(phonenumbers.parse(number_to_check, self.partner_id.mobile_code_res_country_id.code)))
-                if return_is_mobile == False:
-                    allow_send = False
-                    raise Warning("El movil no es valido")
-            except phonenumbers.NumberParseException:
-                allow_send = False
-                raise Warning("El movil no es valido (NumberParseException)")
-
         if allow_send == True and self.partner_id.opt_out==True:
             allow_send = False
             raise Warning("El cliente no acepta mensajes")
-
+        #action_check_valid_phone
+        if allow_send==True:
+            return_valid_phone = self.env['sms.message'].sudo().action_check_valid_phone(self.partner_id.mobile_code_res_country_id, self.partner_id.mobile)
+            allow_send = return_valid_phone['valid']
+            if allow_send==False:
+                raise Warning(allow_send['error'])
+        #final
         if allow_send == True:
             ir_model_data = self.env['ir.model.data']
 
