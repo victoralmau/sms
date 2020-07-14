@@ -1,1 +1,0 @@
-Implementa el addon aws_sms respecto a arelux_partner_questionnaire para que justo antes de enviar el SMS se revise si ese modelo tiene el campo: ar_qt_activity_type y si corresponde a Todocesped/Arelux se cambiará el sender definido en el SMS para adaptarlo a lo que realmente debería ser.
