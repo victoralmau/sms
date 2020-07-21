@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+
         <record model="ir.ui.view" id="sms_compose_message_wizard_form">
             <field name="name">sms_compose_message_wizard_form</field>
             <field name="model">sms.compose.message</field>
@@ -23,5 +24,6 @@
                 </form>
             </field>
         </record>
+
     </data>
 </odoo>

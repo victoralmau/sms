@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 from odoo import api, fields, models
 
@@ -18,13 +17,13 @@ class SmsComposeMessage(models.Model):
     
     country_id = fields.Many2one(
         comodel_name='res.country',
-        string='Pais'
+        string='Country'
     )
     mobile = fields.Char(
         string='Mobile'
     )
     message = fields.Text(
-        string='Mensaje'
+        string='Message'
     )
     sender = fields.Char(
         string='Sender'
@@ -37,7 +36,7 @@ class SmsComposeMessage(models.Model):
     )
     sms_template_id = fields.Many2one(
         comodel_name='sms.template',
-        string='Plantilla SMS'
+        string='Sms template'
     )
     action_send = fields.Boolean(
         string='Action Send'
@@ -54,20 +53,19 @@ class SmsComposeMessage(models.Model):
         
             mobile = self.mobile.strip()
             if '+' in str(mobile):
-                if wizard_item.country_id.id>0:
+                if wizard_item.country_id:
                     mobile = mobile.replace('+'+str(wizard_item.country_id.phone_code), '')
                 else:
                     country_code = mobile[1:2]
                     mobile = mobile[3:]
-                    #country_id
+                    # country_id
                     res_country_ids = self.env['res.country'].search([('phone_code', '=', wizard_item.res_id)])
-                    if len(res_country_ids)>0:
-                        res_country_id = res_country_ids[0]
-                        wizard_item.country_id = res_country_id.id
-            #clean                
+                    if res_country_ids:
+                        wizard_item.country_id = res_country_ids[0].id
+            # clean
             mobile = mobile.replace(' ', '')
-            #sms_message_vals
-            sms_message_vals = {
+            # sms_message_vals
+            vals = {
                 'country_id': wizard_item.country_id.id,
                 'mobile': mobile,
                 'message': wizard_item.message,
@@ -76,30 +74,30 @@ class SmsComposeMessage(models.Model):
                 'res_id': wizard_item.res_id,
                 'user_id': self.env.user.id                                                          
             }                        
-            sms_message_obj = self.env['sms.message'].sudo(self.env.user.id).create(sms_message_vals)        
+            sms_message_obj = self.env['sms.message'].sudo(self.env.user.id).create(vals)
             return_action_send = sms_message_obj.action_send()
-            #Fix list
+            # Fix list
             if isinstance(return_action_send, (list,)):
                 return_action_send = return_action_send[0]
                             
             wizard_item.action_send = return_action_send
                                     
-            if wizard_item.action_send==True:            
-                #update_sale_order
-                if wizard_item.model=='sale.order':
+            if wizard_item.action_send:
+                # update_sale_order
+                if wizard_item.model == 'sale.order':
                     sale_order_id = self.env['sale.order'].search([('id', '=', wizard_item.res_id)])[0]
-                    #date_order_send_sms
-                    if sale_order_id.date_order_send_sms==False:
+                    # date_order_send_sms
+                    if sale_order_id.date_order_send_sms == False:
                         sale_order_id.date_order_send_sms = fields.datetime.now()
-                    #change_to_sale state
-                    if sale_order_id.state=='draft':
+                    # change_to_sale state
+                    if sale_order_id.state == 'draft':
                         sale_order_id.state = 'sent'
                         
-                #mail_message_note
+                # mail_message_note
                 mail_message_body = '<b>SMS</b><br/>'+str(sms_message_obj.message)
                 mail_message_body = mail_message_body.replace('\n', '<br/>')
                 
-                mail_message_vals = {
+                vals = {
                     'subtype_id': 2,
                     'body': mail_message_body,
                     'record_name': 'SMS',
@@ -108,7 +106,7 @@ class SmsComposeMessage(models.Model):
                     'model': wizard_item.model,
                     'message_type': 'comment',                                                         
                 }                        
-                mail_message_obj = self.env['mail.message'].sudo(self.env.user.id).create(mail_message_vals)
+                self.env['mail.message'].sudo(self.env.user.id).create(vals)
                         
         return {'type': 'ir.actions.act_window_close'}
         
@@ -120,9 +118,9 @@ class SmsComposeMessage(models.Model):
     @api.onchange('sms_template_id')
     def onchange_sms_template_id_wrapper(self):
         self.ensure_one()
-        if self.sms_template_id.id>0:
+        if self.sms_template_id:
             values = self.onchange_sms_template_id(self.sms_template_id.id, self.model, self.res_id)['value']
-            if len(values)>0:
+            if values:
                 for value_key in values:
                     setattr(self, value_key, values[value_key])
 

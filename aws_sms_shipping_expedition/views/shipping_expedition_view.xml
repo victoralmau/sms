@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
     <record id="sms_shipping_expedition_shipping_expedition_form_view" model="ir.ui.view">
         <field name="name">sms_shipping_expedition_shipping_expedition_form_view</field>
         <field name="model">shipping.expedition</field>
@@ -10,8 +11,9 @@
                 <field name="date_send_sms_info" readonly="1" />    
             </field>
             <xpath expr="//header/button[@name='action_cancell'][1]" position="after">
-                <button name="action_send_sms" type="object" string="Enviar sms"/>
+                <button name="action_send_sms" type="object" string="Send SMS"/>
             </xpath>
         </field>
-    </record>               
+    </record>
+
 </odoo>

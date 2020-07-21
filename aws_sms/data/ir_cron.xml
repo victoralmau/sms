@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo noupdate="1">
+
     <record id="cron_sms_usage_reports" forcecreate="True" model="ir.cron">
         <field name="name">SMS USAGE REPORTS</field>
         <field name="active" eval="False"/>
@@ -12,4 +13,5 @@
         <field name="state">code</field>
         <field name="code">model.cron_sms_usage_reports()</field>
     </record>
+
 </odoo>

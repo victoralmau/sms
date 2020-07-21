@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
-from odoo import api, fields, models, tools
+from odoo import api, fields, models, tools, _
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
 import boto3
@@ -24,27 +23,17 @@ from phonenumbers.phonenumberutil import number_type
 class SmsMessage(models.Model):
     _name = 'sms.message'
     _description = 'SMS Message'
-    
-    name = fields.Char(        
-        compute='_get_name',
-        string='Nombre',
-        store=False
-    )
-    
-    @api.one        
-    def _get_name(self):            
-        for obj in self:
-            obj.name = obj.message_id
-    
+    _rec_name = 'message_id'
+
     country_id = fields.Many2one(
         comodel_name='res.country',
-        string='Pais'
+        string='Country'
     )
     mobile = fields.Char(
         string='Mobile'
     )
     message = fields.Text(
-        string='Mensaje'
+        string='Message'
     )
     sender = fields.Char(
         string='Sender'
@@ -54,24 +43,24 @@ class SmsMessage(models.Model):
     )
     model_id = fields.Many2one(
         comodel_name='ir.model',
-        string='Modelo'
+        string='Model'
     )
     res_id = fields.Integer(
         string='Related Document ID'
     )
     state = fields.Selection(
         selection=[ 
-            ('delivery','Entregado'), 
-            ('failed','Error'),                         
+            ('delivery','Delivery'),
+            ('failed','Failed'),
         ],
         default='delivery',
-        string='Estado', 
+        string='State',
     )
     delivery_status = fields.Char(
         string='Delivery Status'
     )
     price = fields.Float(
-        string='Precio'
+        string='Price'
     )
     part_number = fields.Integer(
         string='Part Number'
@@ -81,12 +70,12 @@ class SmsMessage(models.Model):
     )
     user_id = fields.Many2one(
         comodel_name='res.users',
-        string='Comercial'
+        string='User id'
     )
     
     @api.model
     def create(self, values):
-        #replace accents unidecode
+        # replace accents unidecode
         if 'message' in values:            
             values['message'] = unidecode.unidecode(values['message'])
         
@@ -105,16 +94,16 @@ class SmsMessage(models.Model):
         # check mobile
         if mobile == False or mobile == None:
             return_item['valid'] = False
-            return_item['error'] = 'Es necesario definir un movil'
+            return_item['error'] = _('It is necessary to define a mobile')
         # check_country_code
         if country_id.id == 0:
             return_item['valid'] = False
-            return_item['error'] = 'El prefijo NO está definido'
+            return_item['error'] = _('The prefix is NOT defined')
         # check prefix in phone
-        if mobile != False:
+        if mobile:
             if '+' in mobile:
                 return_item['valid'] = False
-                return_item['error'] = 'El prefijo NO debe estar definido en el movil'
+                return_item['error'] = _('The prefix must NOT be defined in the mobile')
         # phonenumbers
         if return_item['valid'] == True:
             number_to_check = '+' + str(country_id.phone_code) + str(mobile)
@@ -122,10 +111,10 @@ class SmsMessage(models.Model):
                 return_is_mobile = carrier._is_mobile(number_type(phonenumbers.parse(number_to_check, country_id.code)))
                 if return_is_mobile == False:
                     return_item['valid'] = False
-                    return_item['error'] = 'El movil no es valido'
+                    return_item['error'] = _('The mobile is not valid')
             except phonenumbers.NumberParseException:
                 return_item['valid'] = False
-                return_item['error'] = 'El movil no es valido (NumberParseException)'
+                return_item['error'] = _('The phone is not valid (NumberParseException)')
         # return
         return return_item
 
@@ -166,7 +155,7 @@ class SmsMessage(models.Model):
                 }
             )                        
             
-            #Fix MessageId
+            # Fix MessageId
             if 'MessageId' in response:
                 self.message_id = response['MessageId']
             else:
@@ -182,10 +171,10 @@ class SmsMessage(models.Model):
             }
                      
             if e.response['Error']['Code'] == 'EntityAlreadyExists':
-                res_return['error'] = "User already exists"
+                res_return['error'] = _("User already exists")
             else:
-                #res_return['error'] = e
-                res_return['error'] = 'Client error'
+                # res_return['error'] = e
+                res_return['error'] = _('Client error')
                                                 
             return res_return
             
@@ -194,7 +183,7 @@ class SmsMessage(models.Model):
         if 'False' in self.message:
             res_to_slack = {
                 'send': False,                
-                'error': 'El mensaje contiene False'
+                'error': _('The message contains False')
             }
         
             self.state = 'failed'
@@ -202,8 +191,8 @@ class SmsMessage(models.Model):
             
             return False
         else:
-            return_action = self.action_send_real()#Fix only return
-            #Fix list
+            return_action = self.action_send_real()# Fix only return
+            # Fix list
             if isinstance(return_action, (list,)):
                 return_action = return_action[0]
                 if isinstance(return_action, (list,)):
@@ -219,14 +208,14 @@ class SmsMessage(models.Model):
     def s3_line_sms_message(self, line):
         line_split = line.split(',')
         sms_message_ids = self.env['sms.message'].search([('message_id', '=', line_split[1])])
-        if len(sms_message_ids)>0:
+        if sms_message_ids:
             sms_message_id = sms_message_ids[0]
-            if sms_message_id.price==False:            
+            if sms_message_id.price == False:
                 #state
                 delivery_status = line_split[4]
                 if "accepted" not in delivery_status:                                                                                
                     sms_message_id.state = 'failed'
-                #other_fields
+                # other_fields
                 sms_message_id.delivery_status = line_split[4]
                 sms_message_id.price = line_split[5]
                 sms_message_id.part_number = line_split[6]
@@ -273,15 +262,15 @@ class SmsMessage(models.Model):
                             
                             count_lines = 0
                             for content_file_line in content_file:
-                                if count_lines>0:
+                                if count_lines > 0:
                                     self.s3_line_sms_message(content_file_line)
                                     
                                 count_lines += 1                    
-                    #read_file
-                    if obj_gzip==False:        
+                    # read_file
+                    if obj_gzip == False:
                         count_lines = 0
                         for line in obj['Body']._raw_stream:
-                            if count_lines>0:
+                            if count_lines > 0:
                                 self.s3_line_sms_message(line)
                                                         
                             count_lines += 1                                                                    

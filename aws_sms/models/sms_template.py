@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 from odoo import api, fields, models, tools
 import boto3
@@ -129,7 +128,7 @@ class SmsTemplate(models.Model):
             res_ids = [res_ids]
 
         results = dict.fromkeys(res_ids, u"")
-        #fix        
+        # fix
         if isinstance(model_id, str) or isinstance(model_id, unicode):
             model_id = self.env['ir.model'].search([('model', '=', model_id)])[0]            
         # try to load the template
