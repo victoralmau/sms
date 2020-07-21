@@ -1,0 +1,39 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* aws_sms_shipping_expedition
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 12.0-20200601\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-07-21 12:09+0000\n"
+"PO-Revision-Date: 2020-07-21 12:09+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: aws_sms_shipping_expedition
+#: model:ir.model.fields,field_description:aws_sms_shipping_expedition.field_shipping_expedition__date_send_sms_info
+msgid "Date send sms info"
+msgstr "Fecha envío SMS info"
+
+#. module: aws_sms_shipping_expedition
+#: model_terms:ir.ui.view,arch_db:aws_sms_shipping_expedition.sms_shipping_expedition_shipping_expedition_form_view
+msgid "Send SMS"
+msgstr "Enviar SMS"
+
+#. module: aws_sms_shipping_expedition
+#: model:ir.model,name:aws_sms_shipping_expedition.model_shipping_expedition
+msgid "Shipping Expedicion"
+msgstr ""
+
+#. module: aws_sms_shipping_expedition
+#: code:addons/aws_sms_shipping_expedition/models/shipping_expedition.py:26
+#: code:addonsOdooNodrizaTech/sms/12.0/aws_sms_shipping_expedition/models/shipping_expedition.py:26
+#, python-format
+msgid "The client does not accept messages"
+msgstr ""
+

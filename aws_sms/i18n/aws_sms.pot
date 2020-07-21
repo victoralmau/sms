@@ -1,0 +1,368 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* aws_sms
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 12.0-20200601\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-07-21 12:08+0000\n"
+"PO-Revision-Date: 2020-07-21 12:08+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_compose_message__action_send
+#: model:ir.model.fields,field_description:aws_sms.field_sms_composer__action_send
+msgid "Action Send"
+msgstr ""
+
+#. module: aws_sms
+#: model_terms:ir.ui.view,arch_db:aws_sms.sms_compose_message_wizard_form
+msgid "Cancelar"
+msgstr ""
+
+#. module: aws_sms
+#: code:addons/aws_sms/models/sms_message.py:177
+#: code:addonsOdooNodrizaTech/sms/12.0/aws_sms/models/sms_message.py:177
+#, python-format
+msgid "Client error"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_template__message
+msgid "Contenido"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_compose_message__country_id
+#: model:ir.model.fields,field_description:aws_sms.field_sms_composer__country_id
+#: model:ir.model.fields,field_description:aws_sms.field_sms_message__country_id
+msgid "Country"
+msgstr ""
+
+#. module: aws_sms
+#: model_terms:ir.ui.view,arch_db:aws_sms.sms_compose_message_wizard_form
+msgid "Crear SMS"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_compose_message__create_uid
+#: model:ir.model.fields,field_description:aws_sms.field_sms_composer__create_uid
+#: model:ir.model.fields,field_description:aws_sms.field_sms_message__create_uid
+#: model:ir.model.fields,field_description:aws_sms.field_sms_template__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_compose_message__create_date
+#: model:ir.model.fields,field_description:aws_sms.field_sms_composer__create_date
+#: model:ir.model.fields,field_description:aws_sms.field_sms_message__create_date
+#: model:ir.model.fields,field_description:aws_sms.field_sms_template__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: aws_sms
+#: model_terms:ir.ui.view,arch_db:aws_sms.sms_message_tree
+msgid "Date"
+msgstr ""
+
+#. module: aws_sms
+#: selection:sms.message,state:0
+msgid "Delivery"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_message__delivery_status
+msgid "Delivery Status"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_compose_message__display_name
+#: model:ir.model.fields,field_description:aws_sms.field_sms_composer__display_name
+#: model:ir.model.fields,field_description:aws_sms.field_sms_message__display_name
+#: model:ir.model.fields,field_description:aws_sms.field_sms_template__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: aws_sms
+#: model_terms:ir.ui.view,arch_db:aws_sms.sms_compose_message_wizard_form
+msgid "Enviar"
+msgstr ""
+
+#. module: aws_sms
+#: selection:sms.message,state:0
+msgid "Failed"
+msgstr ""
+
+#. module: aws_sms
+#: code:addons/aws_sms/models/sms_template.py:160
+#: code:addonsOdooNodrizaTech/sms/12.0/aws_sms/models/sms_template.py:160
+#, python-format
+msgid "Failed to render template %r using values %r"
+msgstr ""
+
+#. module: aws_sms
+#: model_terms:ir.ui.view,arch_db:aws_sms.view_sms_message_search
+#: model_terms:ir.ui.view,arch_db:aws_sms.view_sms_template_search
+msgid "Group by"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_compose_message__id
+#: model:ir.model.fields,field_description:aws_sms.field_sms_composer__id
+#: model:ir.model.fields,field_description:aws_sms.field_sms_message__id
+#: model:ir.model.fields,field_description:aws_sms.field_sms_template__id
+msgid "ID"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_template__lang
+msgid "Idioma"
+msgstr ""
+
+#. module: aws_sms
+#: code:addons/aws_sms/models/sms_message.py:97
+#: code:addonsOdooNodrizaTech/sms/12.0/aws_sms/models/sms_message.py:97
+#, python-format
+msgid "It is necessary to define a mobile"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_compose_message____last_update
+#: model:ir.model.fields,field_description:aws_sms.field_sms_composer____last_update
+#: model:ir.model.fields,field_description:aws_sms.field_sms_message____last_update
+#: model:ir.model.fields,field_description:aws_sms.field_sms_template____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_compose_message__write_uid
+#: model:ir.model.fields,field_description:aws_sms.field_sms_composer__write_uid
+#: model:ir.model.fields,field_description:aws_sms.field_sms_message__write_uid
+#: model:ir.model.fields,field_description:aws_sms.field_sms_template__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_compose_message__write_date
+#: model:ir.model.fields,field_description:aws_sms.field_sms_composer__write_date
+#: model:ir.model.fields,field_description:aws_sms.field_sms_message__write_date
+#: model:ir.model.fields,field_description:aws_sms.field_sms_template__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_compose_message__message
+#: model:ir.model.fields,field_description:aws_sms.field_sms_composer__message
+#: model:ir.model.fields,field_description:aws_sms.field_sms_message__message
+msgid "Message"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_compose_message__model
+#: model:ir.model.fields,field_description:aws_sms.field_sms_composer__model
+#: model:ir.model.fields,field_description:aws_sms.field_sms_message__message_id
+msgid "Message Id"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.ui.menu,name:aws_sms.menuitem_odoo_sms_message
+msgid "Messages"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_compose_message__mobile
+#: model:ir.model.fields,field_description:aws_sms.field_sms_composer__mobile
+#: model:ir.model.fields,field_description:aws_sms.field_sms_message__mobile
+msgid "Mobile"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_message__model_id
+#: model_terms:ir.ui.view,arch_db:aws_sms.view_sms_message_search
+#: model_terms:ir.ui.view,arch_db:aws_sms.view_sms_template_search
+msgid "Model"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_template__model_id
+msgid "Modelo"
+msgstr ""
+
+#. module: aws_sms
+#: model_terms:ir.ui.view,arch_db:aws_sms.view_sms_message_search
+msgid "My messages"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_template__name
+msgid "Nombre"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_message__part_number
+msgid "Part Number"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_message__price
+msgid "Price"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_compose_message__res_id
+#: model:ir.model.fields,field_description:aws_sms.field_sms_composer__res_id
+#: model:ir.model.fields,field_description:aws_sms.field_sms_message__res_id
+msgid "Related Document ID"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.ui.menu,name:aws_sms.menu_odoo_sms_arelux
+msgid "SMS"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model,name:aws_sms.model_sms_compose_message
+msgid "SMS Compose Message"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model,name:aws_sms.model_sms_message
+#: model_terms:ir.ui.view,arch_db:aws_sms.sms_message_form_view
+msgid "SMS Message"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.actions.act_window,name:aws_sms.sms_message_action
+#: model_terms:ir.ui.view,arch_db:aws_sms.sms_message_tree
+#: model_terms:ir.ui.view,arch_db:aws_sms.view_sms_message_search
+msgid "SMS Messages"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model,name:aws_sms.model_sms_template
+msgid "SMS Plantilla"
+msgstr ""
+
+#. module: aws_sms
+#: model_terms:ir.ui.view,arch_db:aws_sms.sms_template_form_view
+msgid "SMS Template"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.actions.act_window,name:aws_sms.sms_template_action
+#: model_terms:ir.ui.view,arch_db:aws_sms.sms_template_tree
+#: model_terms:ir.ui.view,arch_db:aws_sms.view_sms_template_search
+msgid "SMS Templates"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.actions.server,name:aws_sms.cron_sms_usage_reports_ir_actions_server
+#: model:ir.cron,cron_name:aws_sms.cron_sms_usage_reports
+#: model:ir.cron,name:aws_sms.cron_sms_usage_reports
+msgid "SMS USAGE REPORTS"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model,name:aws_sms.model_sms_composer
+msgid "SMS composition wizard"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_compose_message__sender
+#: model:ir.model.fields,field_description:aws_sms.field_sms_composer__sender
+#: model:ir.model.fields,field_description:aws_sms.field_sms_message__sender
+#: model_terms:ir.ui.view,arch_db:aws_sms.view_sms_template_search
+msgid "Sender"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_template__sender
+msgid "Sender default"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_compose_message__sms_template_id
+#: model:ir.model.fields,field_description:aws_sms.field_sms_composer__sms_template_id
+msgid "Sms template"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_message__state
+#: model_terms:ir.ui.view,arch_db:aws_sms.view_sms_message_search
+msgid "State"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.ui.menu,name:aws_sms.menuitem_odoo_sms_template
+msgid "Template"
+msgstr ""
+
+#. module: aws_sms
+#: code:addons/aws_sms/models/sms_message.py:186
+#: code:addonsOdooNodrizaTech/sms/12.0/aws_sms/models/sms_message.py:186
+#, python-format
+msgid "The message contains False"
+msgstr ""
+
+#. module: aws_sms
+#: code:addons/aws_sms/models/sms_message.py:114
+#: code:addonsOdooNodrizaTech/sms/12.0/aws_sms/models/sms_message.py:114
+#, python-format
+msgid "The mobile is not valid"
+msgstr ""
+
+#. module: aws_sms
+#: code:addons/aws_sms/models/sms_message.py:117
+#: code:addonsOdooNodrizaTech/sms/12.0/aws_sms/models/sms_message.py:117
+#, python-format
+msgid "The phone is not valid (NumberParseException)"
+msgstr ""
+
+#. module: aws_sms
+#: code:addons/aws_sms/models/sms_message.py:101
+#: code:addonsOdooNodrizaTech/sms/12.0/aws_sms/models/sms_message.py:101
+#, python-format
+msgid "The prefix is NOT defined"
+msgstr ""
+
+#. module: aws_sms
+#: code:addons/aws_sms/models/sms_message.py:106
+#: code:addonsOdooNodrizaTech/sms/12.0/aws_sms/models/sms_message.py:106
+#, python-format
+msgid "The prefix must NOT be defined in the mobile"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_message__total_parts
+msgid "Total Parts"
+msgstr ""
+
+#. module: aws_sms
+#: model_terms:ir.ui.view,arch_db:aws_sms.view_sms_message_search
+msgid "User"
+msgstr ""
+
+#. module: aws_sms
+#: code:addons/aws_sms/models/sms_message.py:174
+#: code:addonsOdooNodrizaTech/sms/12.0/aws_sms/models/sms_message.py:174
+#, python-format
+msgid "User already exists"
+msgstr ""
+
+#. module: aws_sms
+#: model:ir.model.fields,field_description:aws_sms.field_sms_message__user_id
+msgid "User id"
+msgstr ""
+
+#. module: aws_sms
+#: model_terms:ir.ui.view,arch_db:aws_sms.sms_message_form_view
+#: model_terms:ir.ui.view,arch_db:aws_sms.sms_template_form_view
+msgid "child"
+msgstr ""
+

@@ -1,0 +1,39 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+#	* aws_sms_sale
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 12.0-20200601\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-07-21 12:08+0000\n"
+"PO-Revision-Date: 2020-07-21 12:08+0000\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: aws_sms_sale
+#: model:ir.model.fields,field_description:aws_sms_sale.field_sale_order__date_order_send_sms
+msgid "Date send sms"
+msgstr ""
+
+#. module: aws_sms_sale
+#: model:ir.model,name:aws_sms_sale.model_sale_order
+msgid "Sale Order"
+msgstr ""
+
+#. module: aws_sms_sale
+#: model_terms:ir.ui.view,arch_db:aws_sms_sale.sms_sale_view_order_form
+msgid "Send SMS"
+msgstr ""
+
+#. module: aws_sms_sale
+#: code:addons/aws_sms_sale/models/sale_order.py:71
+#: code:addonsOdooNodrizaTech/sms/12.0/aws_sms_sale/models/sale_order.py:71
+#, python-format
+msgid "The client does not accept messages"
+msgstr ""
+
