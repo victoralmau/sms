@@ -274,7 +274,7 @@ class SmsMessage(models.Model):
                                 },
                                 ExpiresIn=100
                             )
-                            page=urlopen(return_presigned_url)
+                            page = urlopen(return_presigned_url)
                             gzip_filehandle = gzip.GzipFile(
                                 fileobj=io.BytesIO(page.read())
                             )

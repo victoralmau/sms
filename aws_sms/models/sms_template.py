@@ -117,7 +117,7 @@ class SmsTemplate(models.Model):
                 )
 
         return multi_mode and results or results[res_ids[0]]
-    
+
     @api.model
     def render_template(self, template_txt, model_id, res_ids, post_process=False):
         multi_mode = True
@@ -127,7 +127,8 @@ class SmsTemplate(models.Model):
             model_id = self.env['ir.model'].search([('model', '=', model_id)])[0]
         # try to load the template
         try:
-            mako_env = item2 if self.env.context.get('safe') else mako_template_env
+            mako_env = \
+                mako_safe_template_env if self.env.context.get('safe') else mako_template_env
             template = mako_env.from_string(tools.ustr(template_txt))
         except Exception:
             _logger.info("Failed to load template %r", template_txt, exc_info=True)
@@ -171,7 +172,7 @@ class SmsTemplate(models.Model):
                 results[res_id] = result
 
         return multi_mode and results or results[res_ids[0]]
-        
+
     @api.multi
     def get_sms_template(self, res_ids):
         multi_mode = True

@@ -14,7 +14,8 @@
             "botocore",
             "phonenumbers",
             "urllib",
-            "unidecode"
+            "unidecode",
+            "unicode"
         ],
     },
     "depends": [
