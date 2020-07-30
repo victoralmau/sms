@@ -13,8 +13,6 @@
             "boto3",
             "botocore",
             "phonenumbers",
-            "urllib",
-            "unidecode",
             "unicode"
         ],
     },

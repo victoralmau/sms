@@ -5,7 +5,7 @@ import copy
 import datetime
 import unicode
 
-from urllib.parse import urlencode, quote as quote
+from werkzeug import urls
 from functools import reduce
 
 import logging
@@ -34,8 +34,8 @@ try:
     )
     mako_template_env.globals.update({
         'str': str,
-        'quote': quote,
-        'urlencode': urlencode,
+        'quote': urls.url_quote,
+        'urlencode': urls.url_encode,
         'datetime': datetime,
         'len': len,
         'abs': abs,
@@ -43,9 +43,14 @@ try:
         'max': max,
         'sum': sum,
         'filter': filter,
-        'reduce': reduce,
+        'reduce': functools.reduce,
         'map': map,
-        'round': round
+        'round': round,
+
+        # dateutil.relativedelta is an old-style class and cannot be directly
+        # instanciated wihtin a jinja2 expression, so a lambda "proxy" is
+        # is needed, apparently.
+        'relativedelta': lambda *a, **kw : relativedelta.relativedelta(*a, **kw),
     })
     mako_safe_template_env = copy.copy(mako_template_env)
     mako_safe_template_env.autoescape = False
