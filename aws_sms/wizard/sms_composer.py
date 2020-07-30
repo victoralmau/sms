@@ -1,10 +1,8 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 from odoo import api, fields, models
 
-import logging
-_logger = logging.getLogger(__name__)
 
-class SmsComposer(models.TransientModel):    
+class SmsComposer(models.TransientModel):
     _name = 'sms.composer'
     _inherit = 'sms.compose.message'
     _description = 'SMS composition wizard'

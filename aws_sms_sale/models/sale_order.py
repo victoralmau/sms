@@ -1,9 +1,7 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
-import logging
-_logger = logging.getLogger(__name__)
-
 from odoo import api, models, fields
-from odoo.exceptions import Warning
+from odoo.exceptions import Warning as UserError
+
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
@@ -25,11 +23,15 @@ class SaleOrder(models.Model):
             if need_check_date_order_send_sms and self.date_order_send_sms:
                 allow_send_sms = False
                             
-            if self.partner_id.mobile == False:
+            if not self.partner_id.mobile:
                 allow_send_sms = False
                             
             if allow_send_sms:
-                sms_template_item = self.env['sms.template'].search([('id', '=', sms_template_id)])[0]                                
+                sms_template_item = self.env['sms.template'].search(
+                    [
+                        ('id', '=', sms_template_id)
+                    ]
+                )[0]
                 vals = {
                     'model': 'sale.order',
                     'res_id': self.id,
@@ -38,23 +40,28 @@ class SaleOrder(models.Model):
                 }
                 
                 if self.user_id.id>0:
-                    sms_compose_message_obj = self.env['sms.compose.message'].sudo(self.user_id.id).create(vals)
+                    message_obj = self.env['sms.compose.message'].sudo(
+                        self.user_id.id
+                    ).create(vals)
                 else:                    
-                    sms_compose_message_obj = self.env['sms.compose.message'].sudo().create(vals)
+                    message_obj = self.env['sms.compose.message'].sudo().create(vals)
                 
-                res = sms_compose_message_obj.onchange_sms_template_id(sms_template_item.id, 'sale.order', self.id)
-                
-                sms_compose_message_obj.update({
+                res = message_obj.onchange_sms_template_id(
+                    sms_template_item.id,
+                    'sale.order',
+                    self.id
+                )
+                message_obj.update({
                     'sender': res['value']['sender'],
                     'message': res['value']['message']
                 })
-                sms_compose_message_obj.send_sms_action()
+                message_obj.send_sms_action()
                 
-                if sms_compose_message_obj.action_send:
-                    if self.date_order_send_sms == False:
+                if message_obj.action_send:
+                    if not self.date_order_send_sms:
                         self.date_order_send_sms = datetime.today()
                         
-                    self.action_custom_send_sms_info_slack()# Fix Slack
+                    self.action_custom_send_sms_info_slack()
                     
         return True                    
     
@@ -71,21 +78,30 @@ class SaleOrder(models.Model):
             raise Warning(_('The client does not accept messages'))
         # action_check_valid_phone
         if allow_send:
-            return_valid_phone = self.env['sms.message'].sudo().action_check_valid_phone(self.partner_id.mobile_code_res_country_id, self.partner_id.mobile)
+            return_valid_phone = self.env['sms.message'].sudo().action_check_valid_phone(
+                self.partner_id.mobile_code_res_country_id,
+                self.partner_id.mobile
+            )
             allow_send = return_valid_phone['valid']
-            if allow_send == False:
-                raise Warning(return_valid_phone['error'])
+            if not allow_send:
+                raise UserError(return_valid_phone['error'])
         # final
         if allow_send:
             ir_model_data = self.env['ir.model.data']
             
             try:
-                sms_template_id = ir_model_data.get_object_reference('sms', 'sms_template_id_default_sale_order')[1]
+                sms_template_id = ir_model_data.get_object_reference(
+                    'sms',
+                    'sms_template_id_default_sale_order'
+                )[1]
             except ValueError:
                 sms_template_id = False            
                                 
             try:
-                compose_form_id = ir_model_data.get_object_reference('mail', 'sms_compose_message_wizard_form')[1]
+                compose_form_id = ir_model_data.get_object_reference(
+                    'sms',
+                    'sms_compose_message_wizard_form'
+                )[1]
             except ValueError:
                 compose_form_id = False
             
@@ -115,4 +131,4 @@ class SaleOrder(models.Model):
                 'view_id': compose_form_id,
                 'target': 'new',
                 'context': ctx,
-            }                                                                
+            }

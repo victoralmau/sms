@@ -57,6 +57,7 @@ try:
 except ImportError:
     _logger.warning("jinja2 not available, templating features will not work!")
 
+
 class SmsTemplate(models.Model):
     _name = 'sms.template'
     _description = 'SMS Plantilla'
@@ -104,7 +105,12 @@ class SmsTemplate(models.Model):
                 Template = Template.with_context(lang=template._context.get('lang'))
             for field in fields:
                 Template = Template.with_context(safe=field in {'sender'})
-                generated_field_values = Template.render_template(getattr(template, field), template.model_id, template_res_ids,post_process=(field == 'message'))
+                generated_field_values = Template.render_template(
+                    getattr(template, field),
+                    template.model_id,
+                    template_res_ids,
+                    post_process=(field == 'message')
+                )
                 for res_id, field_value in generated_field_values.iteritems():
                     results.setdefault(res_id, dict())[field] = field_value            
             # update values for all res_ids
@@ -157,7 +163,7 @@ class SmsTemplate(models.Model):
                 render_result = template.render(variables)
             except Exception:
                 _logger.info("Failed to render template %r using values %r" % (template, variables), exc_info=True)
-                raise UserError(_("Failed to render template %r using values %r")% (template, variables))
+                raise UserError(_("Failed to render template %r using values %r") % (template, variables))
             if render_result == u"False":
                 render_result = u""
             results[res_id] = render_result

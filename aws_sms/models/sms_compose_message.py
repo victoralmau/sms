@@ -1,15 +1,13 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 from odoo import api, fields, models
 
-import logging
-_logger = logging.getLogger(__name__)
-
 import re
 
 def cleanhtml(raw_html):
   cleanr = re.compile('<.*?>')
   cleantext = re.sub(cleanr, '', raw_html)
   return cleantext
+
 
 class SmsComposeMessage(models.Model):
     _name = 'sms.compose.message'
@@ -44,13 +42,17 @@ class SmsComposeMessage(models.Model):
     
     @api.multi
     def send_sms_action(self):
-        self.send_message()                
+        for item in self:
+            item.send_message()
     
     @api.multi
     def send_message(self):        
         for wizard_item in self:
-            model_id = self.env['ir.model'].search([('model', '=', wizard_item.model)])[0]
-        
+            model_id = self.env['ir.model'].search(
+                [
+                    ('model', '=', wizard_item.model)
+                ]
+            )[0]
             mobile = self.mobile.strip()
             if '+' in str(mobile):
                 if wizard_item.country_id:
@@ -59,9 +61,13 @@ class SmsComposeMessage(models.Model):
                     country_code = mobile[1:2]
                     mobile = mobile[3:]
                     # country_id
-                    res_country_ids = self.env['res.country'].search([('phone_code', '=', wizard_item.res_id)])
-                    if res_country_ids:
-                        wizard_item.country_id = res_country_ids[0].id
+                    country_ids = self.env['res.country'].search(
+                        [
+                            ('phone_code', '=', wizard_item.res_id)
+                        ]
+                    )
+                    if country_ids:
+                        wizard_item.country_id = country_ids[0].id
             # clean
             mobile = mobile.replace(' ', '')
             # sms_message_vals
@@ -74,29 +80,33 @@ class SmsComposeMessage(models.Model):
                 'res_id': wizard_item.res_id,
                 'user_id': self.env.user.id                                                          
             }                        
-            sms_message_obj = self.env['sms.message'].sudo(self.env.user.id).create(vals)
+            sms_message_obj = self.env['sms.message'].sudo(
+                self.env.user.id
+            ).create(vals)
             return_action_send = sms_message_obj.action_send()
             # Fix list
             if isinstance(return_action_send, (list,)):
                 return_action_send = return_action_send[0]
                             
             wizard_item.action_send = return_action_send
-                                    
             if wizard_item.action_send:
                 # update_sale_order
                 if wizard_item.model == 'sale.order':
-                    sale_order_id = self.env['sale.order'].search([('id', '=', wizard_item.res_id)])[0]
+                    order_id = self.env['sale.order'].search(
+                        [
+                            ('id', '=', wizard_item.res_id)
+                        ]
+                    )[0]
                     # date_order_send_sms
-                    if sale_order_id.date_order_send_sms == False:
-                        sale_order_id.date_order_send_sms = fields.datetime.now()
+                    if not order_id.date_order_send_sms:
+                        order_id.date_order_send_sms = fields.datetime.now()
                     # change_to_sale state
-                    if sale_order_id.state == 'draft':
-                        sale_order_id.state = 'sent'
+                    if order_id.state == 'draft':
+                        order_id.state = 'sent'
                         
                 # mail_message_note
-                mail_message_body = '<b>SMS</b><br/>'+str(sms_message_obj.message)
+                mail_message_body = '<b>SMS</b><br/>%s' % sms_message_obj.message
                 mail_message_body = mail_message_body.replace('\n', '<br/>')
-                
                 vals = {
                     'subtype_id': 2,
                     'body': mail_message_body,
@@ -119,7 +129,11 @@ class SmsComposeMessage(models.Model):
     def onchange_sms_template_id_wrapper(self):
         self.ensure_one()
         if self.sms_template_id:
-            values = self.onchange_sms_template_id(self.sms_template_id.id, self.model, self.res_id)['value']
+            values = self.onchange_sms_template_id(
+                self.sms_template_id.id,
+                self.model,
+                self.res_id
+            )['value']
             if values:
                 for value_key in values:
                     setattr(self, value_key, values[value_key])
@@ -127,10 +141,19 @@ class SmsComposeMessage(models.Model):
     @api.multi
     def onchange_sms_template_id(self, sms_template_id, model, res_id):
         if sms_template_id:
-            values = self.generate_sms_for_composer(sms_template_id, [res_id])[res_id]            
+            values = self.generate_sms_for_composer(
+                sms_template_id,
+                [res_id]
+            )[res_id]
         else:
-            default_values = self.with_context(default_model=model, default_res_id=res_id).default_get(['model', 'res_id','sender', 'message'])
-            values = dict((key, default_values[key]) for key in ['sender', 'message'] if key in default_values)
+            default_values = self.with_context(
+                default_model=model,
+                default_res_id=res_id
+            ).default_get(['model', 'res_id','sender', 'message'])
+            values = dict(
+                (key, default_values[key])
+                for key in ['sender', 'message'] if key in default_values
+            )
         
         if values.get('message'):
             values['message'] = cleanhtml(values['message'])
@@ -170,7 +193,12 @@ class SmsComposeMessage(models.Model):
             res_ids = [res_ids]
 
         senders = self.render_template(self.sender, self.model, res_ids)
-        messages = self.render_template(self.message, self.model, res_ids, post_process=True)        
+        messages = self.render_template(
+            self.message,
+            self.model,
+            res_ids,
+            post_process=True
+        )
         results = dict.fromkeys(res_ids, False)
         for res_id in res_ids:
             results[res_id] = {
@@ -180,7 +208,11 @@ class SmsComposeMessage(models.Model):
 
         # generate template-based values
         if self.sms_template_id:
-            sms_template_values = self.generate_sms_for_composer(self.sms_template_id.id, res_ids, fields=[])
+            sms_template_values = self.generate_sms_for_composer(
+                self.sms_template_id.id,
+                res_ids,
+                fields=[]
+            )
         else:
             sms_template_values = {}
 
@@ -204,9 +236,17 @@ class SmsComposeMessage(models.Model):
         returned_fields = fields
         values = dict.fromkeys(res_ids, False)
 
-        sms_template_values = self.env['sms.template'].with_context(tpl_partners_only=True).browse(sms_template_id).generate_sms(res_ids, fields=fields)
+        sms_template_values = self.env['sms.template'].with_context(
+            tpl_partners_only=True
+        ).browse(sms_template_id).generate_sms(
+            res_ids,
+            fields=fields
+        )
         for res_id in res_ids:
-            res_id_values = dict((field, sms_template_values[res_id][field]) for field in returned_fields if sms_template_values[res_id].get(field))
+            res_id_values = dict(
+                (field, sms_template_values[res_id][field])
+                for field in returned_fields if sms_template_values[res_id].get(field)
+            )
             res_id_values['message'] = res_id_values.pop('message', '')
             values[res_id] = res_id_values
 
@@ -214,4 +254,9 @@ class SmsComposeMessage(models.Model):
     
     @api.model
     def render_template(self, template, model, res_ids, post_process=False):
-        return self.env['sms.template'].render_template(template, model, res_ids, post_process=post_process)                                                                                                                                                                       
+        return self.env['sms.template'].render_template(
+            template,
+            model,
+            res_ids,
+            post_process=post_process
+        )
