@@ -11,8 +11,10 @@
     "external_dependencies": {
         "python": [
             "boto3",
+            "botocore",
             "phonenumbers",
-            "urllib"
+            "urllib",
+            "unidecode"
         ],
     },
     "depends": [

@@ -1,31 +1,36 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 from odoo import api, models, fields
+import datetime
 from odoo.exceptions import Warning as UserError
 
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
-    
+
     date_order_send_sms = fields.Datetime(
         string='Date send sms',
         readonly=True
     )
-    
-    @api.one    
+
+    @api.multi
     def action_custom_send_sms_info_slack(self):
         return True
-    
-    @api.one
-    def action_send_sms_automatic(self, sms_template_id=False, need_check_date_order_send_sms=True):    
+
+    @api.multi
+    def action_send_sms_automatic(self,
+                                  sms_template_id=False,
+                                  need_check_date_order_send_sms=True
+                                  ):
+        self.ensure_one()
         if sms_template_id:
             allow_send_sms = True
-            
+
             if need_check_date_order_send_sms and self.date_order_send_sms:
                 allow_send_sms = False
-                            
+
             if not self.partner_id.mobile:
                 allow_send_sms = False
-                            
+
             if allow_send_sms:
                 sms_template_item = self.env['sms.template'].search(
                     [
@@ -38,14 +43,13 @@ class SaleOrder(models.Model):
                     'mobile': self.partner_id.mobile,
                     'sms_template_id': sms_template_id
                 }
-                
-                if self.user_id.id>0:
+                if self.user_id:
                     message_obj = self.env['sms.compose.message'].sudo(
                         self.user_id.id
                     ).create(vals)
-                else:                    
+                else:
                     message_obj = self.env['sms.compose.message'].sudo().create(vals)
-                
+
                 res = message_obj.onchange_sms_template_id(
                     sms_template_item.id,
                     'sale.order',
@@ -56,20 +60,16 @@ class SaleOrder(models.Model):
                     'message': res['value']['message']
                 })
                 message_obj.send_sms_action()
-                
                 if message_obj.action_send:
                     if not self.date_order_send_sms:
                         self.date_order_send_sms = datetime.today()
-                        
+
                     self.action_custom_send_sms_info_slack()
-                    
+
         return True                    
     
     @api.multi
     def action_send_sms(self):
-        '''
-        This function opens a window to compose an sms, with the edi sale template message loaded by default
-        '''
         self.ensure_one()
         # define
         allow_send = True
@@ -78,13 +78,13 @@ class SaleOrder(models.Model):
             raise Warning(_('The client does not accept messages'))
         # action_check_valid_phone
         if allow_send:
-            return_valid_phone = self.env['sms.message'].sudo().action_check_valid_phone(
+            res = self.env['sms.message'].sudo().action_check_valid_phone(
                 self.partner_id.mobile_code_res_country_id,
                 self.partner_id.mobile
             )
-            allow_send = return_valid_phone['valid']
+            allow_send = res['valid']
             if not allow_send:
-                raise UserError(return_valid_phone['error'])
+                raise UserError(res['error'])
         # final
         if allow_send:
             ir_model_data = self.env['ir.model.data']
@@ -120,7 +120,8 @@ class SaleOrder(models.Model):
                 'default_sms_template_id': sms_template_id,
                 'default_mobile': self.partner_id.mobile,
                 'default_sender': default_sender,
-                'custom_layout': "sms_arelux.sms_template_data_notification_sms_sale_order"
+                'custom_layout':
+                    "sms_arelux.sms_template_data_notification_sms_sale_order"
             })
             return {
                 'type': 'ir.actions.act_window',

@@ -1,6 +1,5 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 from odoo import api, fields, models, tools
-import boto3
 import copy
 import datetime
 
@@ -44,13 +43,7 @@ try:
         'filter': filter,
         'reduce': reduce,
         'map': map,
-        'round': round,
-        'cmp': cmp,
-
-        # dateutil.relativedelta is an old-style class and cannot be directly
-        # instanciated wihtin a jinja2 expression, so a lambda "proxy" is
-        # is needed, apparently.
-        'relativedelta': lambda *a, **kw : relativedelta.relativedelta(*a, **kw),
+        'round': round
     })
     mako_safe_template_env = copy.copy(mako_template_env)
     mako_safe_template_env.autoescape = False

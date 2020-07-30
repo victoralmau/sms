@@ -1,13 +1,10 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
 # https://docs.aws.amazon.com/sns/latest/dg/sms_stats_usage.html
 from odoo import api, fields, models, tools, _
-from dateutil.relativedelta import relativedelta
-from datetime import datetime
 import boto3
 from botocore.exceptions import ClientError
 
 from urllib.request import urlopen
-import json
 import gzip
 import io
 import unidecode
@@ -50,8 +47,8 @@ class SmsMessage(models.Model):
     )
     state = fields.Selection(
         selection=[ 
-            ('delivery','Delivery'),
-            ('failed','Failed'),
+            ('delivery', 'Delivery'),
+            ('failed', 'Failed'),
         ],
         default='delivery',
         string='State',
@@ -76,11 +73,11 @@ class SmsMessage(models.Model):
     @api.model
     def create(self, values):
         # replace accents unidecode
-        if 'message' in values:            
+        if 'message' in values:
             values['message'] = unidecode.unidecode(values['message'])
-        
+
         return super(SmsMessage, self).create(values)
-    
+
     @api.multi
     def action_send_error_sms_message_message_slack(self, res):
         return
@@ -103,7 +100,8 @@ class SmsMessage(models.Model):
         if mobile:
             if '+' in mobile:
                 return_item['valid'] = False
-                return_item['error'] = _('The prefix must NOT be defined in the mobile')
+                return_item['error'] = \
+                    _('The prefix must NOT be defined in the mobile')
         # phonenumbers
         if return_item['valid']:
             number_to_check = '+' + str(country_id.phone_code) + str(mobile)
@@ -125,14 +123,18 @@ class SmsMessage(models.Model):
                     return_item['error'] = _('The mobile is not valid')
             except phonenumbers.NumberParseException:
                 return_item['valid'] = False
-                return_item['error'] = _('The phone is not valid (NumberParseException)')
+                return_item['error'] = \
+                    _('The phone is not valid (NumberParseException)')
         # return
         return return_item
 
     @api.multi
     def action_check_valid(self):
         self.ensure_one()
-        return self.action_check_valid_phone(self.country_id, self.mobile)
+        return self.action_check_valid_phone(
+            self.country_id,
+            self.mobile
+        )
     
     @api.multi
     def action_send_real(self):
@@ -141,7 +143,7 @@ class SmsMessage(models.Model):
         AWS_ACCESS_KEY_ID = tools.config.get('aws_access_key_id')
         AWS_SECRET_ACCESS_KEY = tools.config.get('aws_secret_key_id')
         AWS_SMS_REGION_NAME = tools.config.get('aws_region_name')
-        
+
         try:
             res_return = {
                 'send': True,                
@@ -175,21 +177,19 @@ class SmsMessage(models.Model):
             else:
                 res_return['send'] = False
                 res_return['error'] = response
-                
-            return res_return                
-                                                                                    
+
+            return res_return
         except ClientError as e:
             res_return = {
-                'send': False,                
+                'send': False,
                 'error': ''
             }
-                     
             if e.response['Error']['Code'] == 'EntityAlreadyExists':
                 res_return['error'] = _("User already exists")
             else:
                 # res_return['error'] = e
                 res_return['error'] = _('Client error')
-                                                
+
             return res_return
             
     @api.multi
@@ -197,10 +197,9 @@ class SmsMessage(models.Model):
         self.ensure_one()
         if 'False' in self.message:
             res_to_slack = {
-                'send': False,                
+                'send': False,
                 'error': _('The message contains False')
             }
-        
             self.state = 'failed'
             self.action_send_error_sms_message_message_slack(
                 res_to_slack
@@ -220,7 +219,6 @@ class SmsMessage(models.Model):
                 self.action_send_error_sms_message_message_slack(
                     res_to_slack
                 )
-                    
             return return_action['send']                                            
     
     def s3_line_sms_message(self, line):
@@ -248,7 +246,6 @@ class SmsMessage(models.Model):
         AWS_ACCESS_KEY_ID = tools.config.get('aws_access_key_id')
         AWS_SECRET_ACCESS_KEY = tools.config.get('aws_secret_key_id')
         bucket_sms_report = 'sms-report-arelux'
-        
         s3 = boto3.client(
             "s3",
             aws_access_key_id=AWS_ACCESS_KEY_ID,
@@ -278,9 +275,10 @@ class SmsMessage(models.Model):
                                 ExpiresIn = 100
                             )
                             page=urlopen(return_presigned_url)
-                            gzip_filehandle = gzip.GzipFile(fileobj=io.BytesIO(page.read()))
+                            gzip_filehandle = gzip.GzipFile(
+                                fileobj=io.BytesIO(page.read())
+                            )
                             content_file = gzip_filehandle.readlines()
-                            
                             count_lines = 0
                             for content_file_line in content_file:
                                 if count_lines > 0:

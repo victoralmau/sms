@@ -11,7 +11,10 @@ class SaleOrder(models.Model):
         return super(SaleOrder, self).action_generate_sale_order_link_tracker()
 
     @api.multi
-    def action_send_sms_automatic(self, sms_template_id=False, need_check_date_order_send_sms=True):
+    def action_send_sms_automatic(self,
+                                  sms_template_id=False,
+                                  need_check_date_order_send_sms=True
+                                  ):
         # action_generate_sale_order_link_tracker
         for item in self:
             item.action_generate_sale_order_link_tracker()

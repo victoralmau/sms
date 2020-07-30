@@ -3,6 +3,7 @@ from odoo import api, fields, models
 
 import re
 
+
 def cleanhtml(raw_html):
   cleanr = re.compile('<.*?>')
   cleantext = re.sub(cleanr, '', raw_html)
@@ -12,7 +13,7 @@ def cleanhtml(raw_html):
 class SmsComposeMessage(models.Model):
     _name = 'sms.compose.message'
     _description = 'SMS Compose Message'
-    
+
     country_id = fields.Many2one(
         comodel_name='res.country',
         string='Country'
@@ -28,7 +29,7 @@ class SmsComposeMessage(models.Model):
     )
     model = fields.Char(
         string='Message Id'
-    )    
+    )
     res_id = fields.Integer(
         string='Related Document ID'
     )
@@ -38,13 +39,13 @@ class SmsComposeMessage(models.Model):
     )
     action_send = fields.Boolean(
         string='Action Send'
-    )        
-    
+    )
+
     @api.multi
     def send_sms_action(self):
         for item in self:
             item.send_message()
-    
+
     @api.multi
     def send_message(self):        
         for wizard_item in self:
@@ -56,9 +57,9 @@ class SmsComposeMessage(models.Model):
             mobile = self.mobile.strip()
             if '+' in str(mobile):
                 if wizard_item.country_id:
-                    mobile = mobile.replace('+'+str(wizard_item.country_id.phone_code), '')
+                    item_replace = '+%s' % wizard_item.country_id.phone_code
+                    mobile = mobile.replace(item_replace, '')
                 else:
-                    country_code = mobile[1:2]
                     mobile = mobile[3:]
                     # country_id
                     country_ids = self.env['res.country'].search(
@@ -78,8 +79,8 @@ class SmsComposeMessage(models.Model):
                 'sender': wizard_item.sender,
                 'model_id': model_id.id,
                 'res_id': wizard_item.res_id,
-                'user_id': self.env.user.id                                                          
-            }                        
+                'user_id': self.env.user.id
+            }
             sms_message_obj = self.env['sms.message'].sudo(
                 self.env.user.id
             ).create(vals)
@@ -87,7 +88,7 @@ class SmsComposeMessage(models.Model):
             # Fix list
             if isinstance(return_action_send, (list,)):
                 return_action_send = return_action_send[0]
-                            
+
             wizard_item.action_send = return_action_send
             if wizard_item.action_send:
                 # update_sale_order
@@ -103,7 +104,7 @@ class SmsComposeMessage(models.Model):
                     # change_to_sale state
                     if order_id.state == 'draft':
                         order_id.state = 'sent'
-                        
+
                 # mail_message_note
                 mail_message_body = '<b>SMS</b><br/>%s' % sms_message_obj.message
                 mail_message_body = mail_message_body.replace('\n', '<br/>')
@@ -114,15 +115,15 @@ class SmsComposeMessage(models.Model):
                     'date': fields.datetime.now(),
                     'res_id': wizard_item.res_id,
                     'model': wizard_item.model,
-                    'message_type': 'comment',                                                         
-                }                        
+                    'message_type': 'comment'
+                }
                 self.env['mail.message'].sudo(self.env.user.id).create(vals)
-                        
+
         return {'type': 'ir.actions.act_window_close'}
-        
-    #------------------------------------------------------
+
+    # ------------------------------------------------------
     # Template methods
-    #------------------------------------------------------
+    # ------------------------------------------------------
 
     @api.multi
     @api.onchange('sms_template_id')
@@ -149,12 +150,12 @@ class SmsComposeMessage(models.Model):
             default_values = self.with_context(
                 default_model=model,
                 default_res_id=res_id
-            ).default_get(['model', 'res_id','sender', 'message'])
+            ).default_get(['model', 'res_id', 'sender', 'message'])
             values = dict(
                 (key, default_values[key])
                 for key in ['sender', 'message'] if key in default_values
             )
-        
+
         if values.get('message'):
             values['message'] = cleanhtml(values['message'])
 
@@ -188,10 +189,6 @@ class SmsComposeMessage(models.Model):
         """
         self.ensure_one()
         multi_mode = True
-        if isinstance(res_ids, (int, long)):
-            multi_mode = False
-            res_ids = [res_ids]
-
         senders = self.render_template(self.sender, self.model, res_ids)
         messages = self.render_template(
             self.message,
@@ -221,7 +218,7 @@ class SmsComposeMessage(models.Model):
             sms_template_values[res_id].update(results[res_id])
 
         return multi_mode and sms_template_values or sms_template_values[res_ids[0]]
-    
+
     @api.model
     def generate_sms_for_composer(self, sms_template_id, res_ids, fields=None):
         """ Call sms_template.generate_sms(), get fields relevant for
@@ -251,7 +248,7 @@ class SmsComposeMessage(models.Model):
             values[res_id] = res_id_values
 
         return multi_mode and values or values[res_ids[0]]
-    
+
     @api.model
     def render_template(self, template, model, res_ids, post_process=False):
         return self.env['sms.template'].render_template(

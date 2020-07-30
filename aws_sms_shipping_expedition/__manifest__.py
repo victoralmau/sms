@@ -11,7 +11,7 @@
     "depends": [
         "base",
         "aws_sms",
-        "shipping_expedition"
+        "shipping_expedition"  # https://github.com/OdooNodrizaTech/stock
     ],
     "data": [
         "views/shipping_expedition_view.xml",
