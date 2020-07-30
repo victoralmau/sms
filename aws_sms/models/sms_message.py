@@ -46,7 +46,7 @@ class SmsMessage(models.Model):
         string='Related Document ID'
     )
     state = fields.Selection(
-        selection=[ 
+        selection=[
             ('delivery', 'Delivery'),
             ('failed', 'Failed'),
         ],
@@ -69,7 +69,7 @@ class SmsMessage(models.Model):
         comodel_name='res.users',
         string='User id'
     )
-    
+
     @api.model
     def create(self, values):
         # replace accents unidecode
@@ -135,7 +135,7 @@ class SmsMessage(models.Model):
             self.country_id,
             self.mobile
         )
-    
+
     @api.multi
     def action_send_real(self):
         self.ensure_one()
@@ -146,7 +146,7 @@ class SmsMessage(models.Model):
 
         try:
             res_return = {
-                'send': True,                
+                'send': True,
                 'error': ''
             }
             client = boto3.client(
@@ -191,7 +191,7 @@ class SmsMessage(models.Model):
                 res_return['error'] = _('Client error')
 
             return res_return
-            
+
     @api.multi
     def action_send(self):
         self.ensure_one()
@@ -215,12 +215,12 @@ class SmsMessage(models.Model):
             # slack_message
             if not return_action['send']:
                 res_to_slack = return_action
-                self.state = 'failed'                    
+                self.state = 'failed'
                 self.action_send_error_sms_message_message_slack(
                     res_to_slack
                 )
-            return return_action['send']                                            
-    
+            return return_action['send']
+
     def s3_line_sms_message(self, line):
         line_split = line.split(',')
         sms_message_ids = self.env['sms.message'].search(
@@ -233,15 +233,15 @@ class SmsMessage(models.Model):
             if not sms_message_id.price:
                 # state
                 delivery_status = line_split[4]
-                if "accepted" not in delivery_status:                                                                                
+                if "accepted" not in delivery_status:
                     sms_message_id.state = 'failed'
                 # other_fields
                 sms_message_id.delivery_status = line_split[4]
                 sms_message_id.price = line_split[5]
                 sms_message_id.part_number = line_split[6]
                 sms_message_id.total_parts = line_split[7]
-                                    
-    @api.model    
+
+    @api.model
     def cron_sms_usage_reports(self):
         AWS_ACCESS_KEY_ID = tools.config.get('aws_access_key_id')
         AWS_SECRET_ACCESS_KEY = tools.config.get('aws_secret_key_id')
@@ -251,28 +251,28 @@ class SmsMessage(models.Model):
             aws_access_key_id=AWS_ACCESS_KEY_ID,
             aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
             region_name='eu-west-1'
-        )        
-        all_objects = s3.list_objects(Bucket=bucket_sms_report)        
+        )
+        all_objects = s3.list_objects(Bucket=bucket_sms_report)
         if len(all_objects['Contents']) > 0:
             for content in all_objects['Contents']:
                 obj = s3.get_object(
-                    Bucket=bucket_sms_report, 
+                    Bucket=bucket_sms_report,
                     Key=content['Key']
                 )
-                obj_gzip = False                
-                
+                obj_gzip = False
+
                 if obj['ContentType'] == 'text/plain':
                     if 'ContentEncoding' in obj:
                         if obj['ContentEncoding'] == 'gzip':
                             obj_gzip = True
-                            
+
                             return_presigned_url = s3.generate_presigned_url(
-                                'get_object', 
-                                Params = {
-                                    'Bucket': bucket_sms_report, 
+                                'get_object',
+                                Params={
+                                    'Bucket': bucket_sms_report,
                                     'Key': content['Key']
-                                }, 
-                                ExpiresIn = 100
+                                },
+                                ExpiresIn=100
                             )
                             page=urlopen(return_presigned_url)
                             gzip_filehandle = gzip.GzipFile(
@@ -283,13 +283,13 @@ class SmsMessage(models.Model):
                             for content_file_line in content_file:
                                 if count_lines > 0:
                                     self.s3_line_sms_message(content_file_line)
-                                    
-                                count_lines += 1                    
+
+                                count_lines += 1
                     # read_file
                     if not obj_gzip:
                         count_lines = 0
                         for line in obj['Body']._raw_stream:
                             if count_lines > 0:
                                 self.s3_line_sms_message(line)
-                                                        
+
                             count_lines += 1

@@ -1,7 +1,9 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
-from odoo import api, fields, models, tools
+from odoo import api, fields, models, tools, _
+from odoo.exceptions import Warning as UserError
 import copy
 import datetime
+import unicode
 
 from urllib.parse import urlencode, quote as quote
 from functools import reduce
@@ -54,7 +56,7 @@ except ImportError:
 class SmsTemplate(models.Model):
     _name = 'sms.template'
     _description = 'SMS Plantilla'
-    
+
     model_id = fields.Many2one(
         comodel_name='ir.model',
         string='Modelo'
@@ -63,8 +65,8 @@ class SmsTemplate(models.Model):
         string='Nombre'
     )
     sender = fields.Char(
-        string='Sender default' 
-    )    
+        string='Sender default'
+    )
     message = fields.Text(
         string='Contenido'
     )
@@ -72,14 +74,11 @@ class SmsTemplate(models.Model):
         string='Idioma',
         placeholder="${object.partner_id.lang}"
     )
-    
+
     @api.multi
     def generate_sms(self, res_ids, fields=None):
         self.ensure_one()
         multi_mode = True
-        if isinstance(res_ids, (int, long)):
-            res_ids = [res_ids]
-            multi_mode = False
         if fields is None:
             fields = ['message']
 
@@ -105,7 +104,7 @@ class SmsTemplate(models.Model):
                     post_process=(field == 'message')
                 )
                 for res_id, field_value in generated_field_values.iteritems():
-                    results.setdefault(res_id, dict())[field] = field_value            
+                    results.setdefault(res_id, dict())[field] = field_value
             # update values for all res_ids
             for res_id in template_res_ids:
                 values = results[res_id]
@@ -122,31 +121,25 @@ class SmsTemplate(models.Model):
     @api.model
     def render_template(self, template_txt, model_id, res_ids, post_process=False):
         multi_mode = True
-        if isinstance(res_ids, (int, long)):
-            multi_mode = False
-            res_ids = [res_ids]
-
         results = dict.fromkeys(res_ids, u"")
         # fix
         if isinstance(model_id, str) or isinstance(model_id, unicode):
-            model_id = self.env['ir.model'].search([('model', '=', model_id)])[0]            
+            model_id = self.env['ir.model'].search([('model', '=', model_id)])[0]
         # try to load the template
         try:
-            mako_env = mako_safe_template_env if self.env.context.get('safe') else mako_template_env
+            mako_env = item2 if self.env.context.get('safe') else mako_template_env
             template = mako_env.from_string(tools.ustr(template_txt))
         except Exception:
             _logger.info("Failed to load template %r", template_txt, exc_info=True)
             return multi_mode and results or results[res_ids[0]]
 
         # prepare template variables
-        records = self.env[model_id.model].browse(filter(None, res_ids))  # filter to avoid browsing [None]
+        records = self.env[model_id.model].browse(filter(None, res_ids))
         res_to_rec = dict.fromkeys(res_ids, None)
         for record in records:
             res_to_rec[record.id] = record
+
         variables = {
-            'format_date': lambda date, format=False, context=self._context: format_date(self.env, date, format),
-            'format_tz': lambda dt, tz=False, format=False, context=self._context: format_tz(self.env, dt, tz, format),
-            'format_amount': lambda amount, currency, context=self._context: format_amount(self.env, amount, currency),
             'user': self.env.user,
             'ctx': self._context,  # context kw would clash with mako internals
         }
@@ -155,8 +148,20 @@ class SmsTemplate(models.Model):
             try:
                 render_result = template.render(variables)
             except Exception:
-                _logger.info("Failed to render template %r using values %r" % (template, variables), exc_info=True)
-                raise UserError(_("Failed to render template %r using values %r") % (template, variables))
+                _logger.info(
+                    "Failed to render template %r using values %r"
+                    % (
+                        template,
+                        variables
+                    ), exc_info=True
+                )
+                raise UserError(
+                    _("Failed to render template %r using values %r")
+                    % (
+                        template,
+                        variables
+                    )
+                )
             if render_result == u"False":
                 render_result = u""
             results[res_id] = render_result
@@ -170,10 +175,6 @@ class SmsTemplate(models.Model):
     @api.multi
     def get_sms_template(self, res_ids):
         multi_mode = True
-        if isinstance(res_ids, (int, long)):
-            res_ids = [res_ids]
-            multi_mode = False
-
         if res_ids is None:
             res_ids = [None]
         results = dict.fromkeys(res_ids, False)
@@ -190,4 +191,4 @@ class SmsTemplate(models.Model):
                 template = self
             results[res_id] = template
 
-        return multi_mode and results or results[res_ids[0]]                                                                                                                                       
+        return multi_mode and results or results[res_ids[0]]

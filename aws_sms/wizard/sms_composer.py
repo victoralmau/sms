@@ -39,7 +39,6 @@ class SmsComposer(models.TransientModel):
     def get_message_values(self, res_ids):
         self.ensure_one()
         results = dict.fromkeys(res_ids, False)
-        rendered_values = {}
         # compute alias-based reply-to in batch
         for res_id in res_ids:
             # static wizard (sms.message) values

@@ -1,5 +1,5 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
-from odoo import api, models, fields
+from odoo import api, models, fields, _
 import datetime
 from odoo.exceptions import Warning as UserError
 
@@ -66,8 +66,8 @@ class SaleOrder(models.Model):
 
                     self.action_custom_send_sms_info_slack()
 
-        return True                    
-    
+        return True
+
     @api.multi
     def action_send_sms(self):
         self.ensure_one()
@@ -88,15 +88,14 @@ class SaleOrder(models.Model):
         # final
         if allow_send:
             ir_model_data = self.env['ir.model.data']
-            
             try:
                 sms_template_id = ir_model_data.get_object_reference(
                     'sms',
                     'sms_template_id_default_sale_order'
                 )[1]
             except ValueError:
-                sms_template_id = False            
-                                
+                sms_template_id = False
+
             try:
                 compose_form_id = ir_model_data.get_object_reference(
                     'sms',
@@ -104,14 +103,14 @@ class SaleOrder(models.Model):
                 )[1]
             except ValueError:
                 compose_form_id = False
-            
+
             # default_sender
             default_sender = 'Todocesped'
             if self.ar_qt_activity_type == 'arelux':
                 default_sender = 'Arelux'
             elif self.ar_qt_activity_type == 'evert':
-                default_sender = 'Evert'        
-                        
+                default_sender = 'Evert'
+
             ctx = dict()
             ctx.update({
                 'default_model': 'sale.order',

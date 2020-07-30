@@ -5,9 +5,9 @@ import re
 
 
 def cleanhtml(raw_html):
-  cleanr = re.compile('<.*?>')
-  cleantext = re.sub(cleanr, '', raw_html)
-  return cleantext
+    cleanr = re.compile('<.*?>')
+    cleantext = re.sub(cleanr, '', raw_html)
+    return cleantext
 
 
 class SmsComposeMessage(models.Model):
@@ -47,7 +47,7 @@ class SmsComposeMessage(models.Model):
             item.send_message()
 
     @api.multi
-    def send_message(self):        
+    def send_message(self):
         for wizard_item in self:
             model_id = self.env['ir.model'].search(
                 [
@@ -221,13 +221,7 @@ class SmsComposeMessage(models.Model):
 
     @api.model
     def generate_sms_for_composer(self, sms_template_id, res_ids, fields=None):
-        """ Call sms_template.generate_sms(), get fields relevant for
-            sms.compose.message"""
         multi_mode = True
-        if isinstance(res_ids, (int, long)):
-            multi_mode = False
-            res_ids = [res_ids]
-
         if fields is None:
             fields = ['sender', 'message']
         returned_fields = fields
