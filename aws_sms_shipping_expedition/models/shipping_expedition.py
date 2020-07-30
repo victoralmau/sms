@@ -113,7 +113,9 @@ class ShippingExpedition(models.Model):
                                         self.user_id.id
                                     ).create(vals)
                                 else:
-                                    message_obj = self.env['sms.compose.message'].sudo().create(
+                                    message_obj = self.env[
+                                        'sms.compose.message'
+                                    ].sudo().create(
                                         vals
                                     )
 

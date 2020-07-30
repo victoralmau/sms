@@ -127,8 +127,9 @@ class SmsTemplate(models.Model):
             model_id = self.env['ir.model'].search([('model', '=', model_id)])[0]
         # try to load the template
         try:
+            ctx = self.env.context
             mako_env = \
-                mako_safe_template_env if self.env.context.get('safe') else mako_template_env
+                mako_safe_template_env if ctx.get('safe') else mako_template_env
             template = mako_env.from_string(tools.ustr(template_txt))
         except Exception:
             _logger.info("Failed to load template %r", template_txt, exc_info=True)
