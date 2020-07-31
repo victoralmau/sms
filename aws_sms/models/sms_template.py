@@ -157,9 +157,8 @@ class SmsTemplate(models.Model):
 
         # try to load the template
         try:
-            mako_env = \
-                mako_safe_template_env \
-                    if self.env.context.get('safe') else mako_template_env
+            mako_env = mako_safe_template_env \
+                if self.env.context.get('safe') else mako_template_env
             template = \
                 mako_env.from_string(tools.ustr(template_txt))
         except Exception:
