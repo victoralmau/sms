@@ -10,9 +10,10 @@
     "license": "AGPL-3",
     "depends": [
         "base",
+        "crm",
         "sale",
         "aws_sms",
-        "sale_order_link_tracker"
+        "sale_order_link_tracker"  # https://github.com/OdooNodrizaTech/sale
     ],
     "data": [],
     "installable": True
