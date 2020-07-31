@@ -1,11 +1,13 @@
 # License AGPL-3.0 or later (https://www.gnu.org/licenses/agpl).
-from odoo import api, fields, models, tools, _
-from odoo.exceptions import Warning as UserError
 import copy
 import datetime
 
 from werkzeug import urls
 import functools
+import dateutil.relativedelta as relativedelta
+from odoo import api, fields, models, tools, _
+from odoo.exceptions import Warning as UserError
+from odoo.tools import pycompat
 
 import logging
 _logger = logging.getLogger(__name__)
@@ -156,7 +158,8 @@ class SmsTemplate(models.Model):
         # try to load the template
         try:
             mako_env = \
-                mako_safe_template_env if self.env.context.get('safe') else mako_template_env
+                mako_safe_template_env \
+                    if self.env.context.get('safe') else mako_template_env
             template = \
                 mako_env.from_string(tools.ustr(template_txt))
         except Exception:
