@@ -13,7 +13,7 @@
             "boto3",
             "botocore",
             "phonenumbers",
-            "unicode"
+            "unidecode"
         ],
     },
     "depends": [
