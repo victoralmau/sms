@@ -1,1 +1,2 @@
+OdooNodrizaTech-sale https://github.com/OdooNodrizaTech/sale
 OdooNodrizaTech-stock https://github.com/OdooNodrizaTech/stock
