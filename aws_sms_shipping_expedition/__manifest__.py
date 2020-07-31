@@ -11,7 +11,6 @@
     "depends": [
         "base",
         "aws_sms",
-        "cashondelivery",  # https://github.com/OdooNodrizaTech/sale
         "shipping_expedition"  # https://github.com/OdooNodrizaTech/stock
     ],
     "data": [
